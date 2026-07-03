@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zuri's Closet</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #F9E8EC 0%, #F5DDE8 30%, #F0D5E2 60%, #EDD5C8 85%, #EED0B8 100%);
+    font-family: Georgia, serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+  }
+
+  .card {
+    background: rgba(255, 250, 248, 0.92);
+    border-radius: 28px;
+    border: 1.5px solid rgba(220,170,175,0.35);
+    padding: 1.5rem 1.75rem;
+    max-width: 860px;
+    width: 100%;
+    box-shadow: 0 8px 48px rgba(160,80,100,0.1);
+  }
+
+  .title { text-align: center; margin-bottom: 1.25rem; }
+  .title h1 { font-size: 32px; color: #8B3055; letter-spacing: 1px; }
+  .title p { font-size: 13px; color: #C09098; font-family: 'Segoe UI', sans-serif; margin-top: 4px; }
+
+  .layout { display: flex; gap: 1.5rem; align-items: flex-end; }
+
+  .doll-col {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .doll-frame {
+    width: 280px;
+    height: 480px;
+    background: linear-gradient(180deg, #FFF0F5 0%, #FDE8D8 100%);
+    border-radius: 24px;
+    border: 1.5px solid rgba(210,160,170,0.3);
+    overflow: hidden;
+    position: relative;
+    transition: background 0.3s;
+  }
+  .doll-frame canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  .doll-name { font-size: 22px; color: #8B3055; font-style: italic; }
+
+  .reset-btn {
+    font-size: 11px;
+    font-family: 'Segoe UI', sans-serif;
+    color: #B07888;
+    background: none;
+    border: 1px solid rgba(180,120,140,0.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .reset-btn:hover { background: #FFF0F5; border-color: #C9559A; color: #8B3055; }
+
+  .wardrobe-col { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+  .section-title {
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: #B07888;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 2px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: rgba(180,120,140,0.2);
+  }
+
+  .btn-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .outfit-btn {
+    width: 70px; height: 70px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(210,160,175,0.35);
+    background: rgba(255,248,251,0.9);
+    cursor: pointer;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 3px;
+    transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
+    overflow: hidden; padding: 4px;
+    position: relative;
+  }
+  .outfit-btn.empty {
+    border-style: dashed;
+    border-color: rgba(210,160,175,0.25);
+    cursor: default;
+    opacity: 0.5;
+  }
+  .outfit-btn:not(.empty):hover {
+    transform: scale(1.08);
+    border-color: #D4709A;
+    box-shadow: 0 4px 14px rgba(180,60,100,0.15);
+    background: #FFF0F7;
+  }
+  .outfit-btn.active {
+    border: 2px solid #C9559A;
+    background: #FFE8F4;
+    box-shadow: 0 0 0 3px rgba(201,85,154,0.12);
+    transform: scale(1.05);
+  }
+  .outfit-btn img {
+    width: 52px; height: 52px;
+    object-fit: contain;
+  }
+  .outfit-btn .ico { font-size: 24px; line-height: 1; }
+  .outfit-btn .lbl {
+    font-size: 8px; font-weight: 700; color: #A04070;
+    text-align: center; font-family: 'Segoe UI', sans-serif; line-height: 1.1;
+  }
+  .outfit-btn.empty .lbl { color: #D0A8B8; font-weight: 400; font-style: italic; }
+
+  .acc-btn {
+    height: 36px; padding: 0 12px;
+    border-radius: 20px;
+    border: 1.5px solid rgba(210,160,175,0.35);
+    background: rgba(255,248,251,0.9);
+    cursor: pointer;
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; color: #A04070;
+    font-family: 'Segoe UI', sans-serif;
+    transition: all 0.12s;
+  }
+  .acc-btn:hover { border-color: #D4709A; background: #FFF0F7; }
+  .acc-btn.active {
+    border: 2px solid #C9559A; background: #FFE8F4;
+    box-shadow: 0 0 0 3px rgba(201,85,154,0.1);
+  }
+  .acc-btn .ico { font-size: 15px; }
+
+  .bg-swatches { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+  .swatch {
+    width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+    border: 2px solid rgba(255,255,255,0.7);
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1); transition: transform 0.12s;
+  }
+  .swatch:hover { transform: scale(1.22); }
+  .swatch.active {
+    border-color: #8B3055;
+    box-shadow: 0 0 0 2.5px rgba(139,48,85,0.3); transform: scale(1.12);
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="title">
+    <h1>✦ Zuri's Closet ✦</h1>
+    <p>Mix, match, and style her up!</p>
+  </div>
+
+  <div class="layout">
+    <div class="doll-col">
+      <div class="doll-frame" id="dollFrame">
+        <canvas id="dollCanvas" width="280" height="480"></canvas>
+      </div>
+      <div class="doll-name">Zuri 🌸</div>
+      <button class="reset-btn" onclick="resetAll()">✦ Start over</button>
+    </div>
+
+    <div class="wardrobe-col">
+
+      <div class="section-title">✨ Full Sets</div>
+      <div class="btn-row" id="sets-row">
+        <button class="outfit-btn" onclick="selectSet('kente_set', this)">
+          <img src="assets/sets/kente_set_thumb.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Blue Kente Set" />
+          <span class="ico" style="display:none">🇬🇭</span>
+          <span class="lbl">Blue Kente Set</span>
+        </button>
+        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">coming soon</span></button>
+        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">coming soon</span></button>
+        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">coming soon</span></button>
+      </div>
+
+      <div class="section-title">👚 Tops</div>
+      <div class="btn-row" id="tops-row">
+        <button class="outfit-btn" onclick="selectLayer('top', 'kente_top', this)">
+          <img src="assets/tops/kente_top.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Kente Top" />
+          <span class="ico" style="display:none">👘</span>
+          <span class="lbl">Kente Top</span>
+        </button>
+        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">blazer</span></button>
+        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">jumpsuit top</span></button>
+        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">dress top</span></button>
+      </div>
+
+      <div class="section-title">👗 Bottoms</div>
+      <div class="btn-row" id="bottoms-row">
+        <button class="outfit-btn" onclick="selectLayer('bottom', 'kente_skirt', this)">
+          <img src="assets/bottoms/kente_skirt.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Kente Skirt" />
+          <span class="ico" style="display:none">👗</span>
+          <span class="lbl">Kente Skirt</span>
+        </button>
+        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">jeans</span></button>
+        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">wide pants</span></button>
+        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">maxi skirt</span></button>
+      </div>
+
+      <div class="section-title">💎 Accessories</div>
+      <div class="btn-row" id="acc-row">
+        <button class="acc-btn" onclick="toggleAcc('flower_crown', this)"><span class="ico">🌸</span> Flower Crown</button>
+        <button class="acc-btn" onclick="toggleAcc('headband', this)"><span class="ico">🎀</span> Headband</button>
+        <button class="acc-btn" onclick="toggleAcc('earrings', this)"><span class="ico">💎</span> Earrings</button>
+        <button class="acc-btn" onclick="toggleAcc('shoes', this)"><span class="ico">👠</span> Shoes</button>
+      </div>
+
+      <div class="section-title">🎨 Background</div>
+      <div class="bg-swatches" id="swatches"></div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('dollCanvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+const state = {
+  top: null,
+  bottom: null,
+  accessories: new Set(),
+};
+
+// Image cache
+const imgCache = {};
+function loadImg(src) {
+  if (imgCache[src]) return imgCache[src];
+  const img = new Image();
+  img.src = src;
+  img.onload = draw;
+  imgCache[src] = img;
+  return img;
+}
+
+// Asset paths -- update these to match your GitHub repo structure
+const ASSETS = {
+  base:        'assets/base/zuri_base.png',
+  // Tops
+  kente_top:   'assets/tops/kente_top.png',
+  blazer:      'assets/tops/blazer.png',
+  jumpsuit_top:'assets/tops/jumpsuit_top.png',
+  dress_top:   'assets/tops/dress_top.png',
+  // Bottoms
+  kente_skirt: 'assets/bottoms/kente_skirt.png',
+  jeans:       'assets/bottoms/jeans.png',
+  wide_pants:  'assets/bottoms/wide_pants.png',
+  maxi_skirt:  'assets/bottoms/maxi_skirt.png',
+  // Sets (full outfit layers bundled)
+  kente_set:   ['assets/bottoms/kente_skirt.png', 'assets/tops/kente_top.png'],
+  // Accessories
+  flower_crown:'assets/accessories/flower_crown.png',
+  headband:    'assets/accessories/headband.png',
+  earrings:    'assets/accessories/earrings.png',
+  shoes:       'assets/accessories/shoes.png',
+};
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  const drawLayer = (src) => {
+    const img = loadImg(src);
+    if (img.complete && img.naturalWidth > 0) {
+      ctx.drawImage(img, 0, 0, W, H);
+    }
+  };
+
+  // Draw order: base -> bottom -> top -> accessories
+  drawLayer(ASSETS.base);
+  if (state.bottom) drawLayer(ASSETS[state.bottom]);
+  if (state.top) drawLayer(ASSETS[state.top]);
+  state.accessories.forEach(acc => {
+    if (ASSETS[acc]) drawLayer(ASSETS[acc]);
+  });
+}
+
+function selectSet(setId, btn) {
+  // Clear individual selections
+  state.top = null;
+  state.bottom = null;
+
+  // Deactivate all top/bottom buttons
+  document.querySelectorAll('#tops-row .outfit-btn, #bottoms-row .outfit-btn')
+    .forEach(b => b.classList.remove('active'));
+
+  // Toggle set
+  const wasActive = btn.classList.contains('active');
+  document.querySelectorAll('#sets-row .outfit-btn').forEach(b => b.classList.remove('active'));
+
+  if (!wasActive) {
+    btn.classList.add('active');
+    // Load set layers
+    const layers = ASSETS[setId];
+    if (layers) {
+      layers.forEach(src => loadImg(src));
+    }
+    state.top = setId + '_top_layer';
+    state.bottom = setId + '_bottom_layer';
+    // Special handling: draw set directly
+    state._setId = setId;
+  } else {
+    state._setId = null;
+  }
+  draw();
+}
+
+function selectLayer(type, id, btn) {
+  // Deactivate set buttons when picking individual piece
+  document.querySelectorAll('#sets-row .outfit-btn').forEach(b => b.classList.remove('active'));
+  state._setId = null;
+
+  const rowId = type === 'top' ? 'tops-row' : 'bottoms-row';
+  const wasActive = btn.classList.contains('active');
+  document.querySelectorAll(`#${rowId} .outfit-btn`).forEach(b => b.classList.remove('active'));
+
+  if (!wasActive) {
+    btn.classList.add('active');
+    state[type] = id;
+  } else {
+    state[type] = null;
+  }
+  draw();
+}
+
+function toggleAcc(id, btn) {
+  if (state.accessories.has(id)) {
+    state.accessories.delete(id);
+    btn.classList.remove('active');
+  } else {
+    state.accessories.add(id);
+    btn.classList.add('active');
+  }
+  draw();
+}
+
+function resetAll() {
+  state.top = null;
+  state.bottom = null;
+  state.accessories.clear();
+  state._setId = null;
+  document.querySelectorAll('.outfit-btn, .acc-btn').forEach(b => b.classList.remove('active'));
+  draw();
+}
+
+// Override draw to handle sets properly
+const _draw = draw;
+window.draw = function() {
+  ctx.clearRect(0, 0, W, H);
+  const drawLayer = (src) => {
+    const img = loadImg(src);
+    if (img.complete && img.naturalWidth > 0) ctx.drawImage(img, 0, 0, W, H);
+  };
+
+  drawLayer(ASSETS.base);
+
+  if (state._setId) {
+    const layers = ASSETS[state._setId];
+    if (layers) layers.forEach(drawLayer);
+  } else {
+    if (state.bottom) drawLayer(ASSETS[state.bottom]);
+    if (state.top) drawLayer(ASSETS[state.top]);
+  }
+
+  state.accessories.forEach(acc => {
+    if (ASSETS[acc]) drawLayer(ASSETS[acc]);
+  });
+};
+
+// Preload base
+loadImg(ASSETS.base);
+
+// Background swatches
+const SWATCHES = [
+  { label:'Blush Champagne', bg:'linear-gradient(180deg,#FFF0F5 0%,#FDE8D8 100%)', display:'#F5D8E0' },
+  { label:'Lavender Dream',  bg:'linear-gradient(180deg,#F5F0FF 0%,#E4D8F8 100%)', display:'#E8DAFF' },
+  { label:'Mint',            bg:'linear-gradient(180deg,#F0FFF8 0%,#D8F0E8 100%)', display:'#D0F0E4' },
+  { label:'Sky Blue',        bg:'linear-gradient(180deg,#EDF6FF 0%,#D5E8F8 100%)', display:'#C8E4FF' },
+  { label:'Peach',           bg:'linear-gradient(180deg,#FFF4EE 0%,#F8E0D0 100%)', display:'#F8D8C0' },
+  { label:'Butter',          bg:'linear-gradient(180deg,#FFFBEE 0%,#F8EDD0 100%)', display:'#F5E8C0' },
+  { label:'White',           bg:'#FFFFFF',                                          display:'#FFFFFF' },
+];
+
+const swatchContainer = document.getElementById('swatches');
+const dollFrame = document.getElementById('dollFrame');
+
+SWATCHES.forEach((s, i) => {
+  const sw = document.createElement('div');
+  sw.className = 'swatch' + (i === 0 ? ' active' : '');
+  sw.title = s.label;
+  sw.style.background = s.display;
+  sw.onclick = () => {
+    document.querySelectorAll('.swatch').forEach(x => x.classList.remove('active'));
+    sw.classList.add('active');
+    dollFrame.style.background = s.bg;
+  };
+  swatchContainer.appendChild(sw);
+});
+</script>
+</body>
+</html>

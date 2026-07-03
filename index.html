@@ -180,7 +180,7 @@
       <div class="section-title">✨ Full Sets</div>
       <div class="btn-row" id="sets-row">
         <button class="outfit-btn" onclick="selectSet('kente_set', this)">
-          <img src="assets/sets/kente_set_thumb.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Blue Kente Set" />
+          <img src="kente_top.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Blue Kente Set" />
           <span class="ico" style="display:none">🇬🇭</span>
           <span class="lbl">Blue Kente Set</span>
         </button>
@@ -192,7 +192,7 @@
       <div class="section-title">👚 Tops</div>
       <div class="btn-row" id="tops-row">
         <button class="outfit-btn" onclick="selectLayer('top', 'kente_top', this)">
-          <img src="assets/tops/kente_top.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Kente Top" />
+          <img src="kente_top.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Kente Top" />
           <span class="ico" style="display:none">👘</span>
           <span class="lbl">Kente Top</span>
         </button>
@@ -204,7 +204,7 @@
       <div class="section-title">👗 Bottoms</div>
       <div class="btn-row" id="bottoms-row">
         <button class="outfit-btn" onclick="selectLayer('bottom', 'kente_skirt', this)">
-          <img src="assets/bottoms/kente_skirt.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Kente Skirt" />
+          <img src="kente_skirt.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Kente Skirt" />
           <span class="ico" style="display:none">👗</span>
           <span class="lbl">Kente Skirt</span>
         </button>
@@ -252,24 +252,24 @@ function loadImg(src) {
 
 // Asset paths -- update these to match your GitHub repo structure
 const ASSETS = {
-  base:        'assets/base/zuri_base.png',
+  base:        'zuri_base.png',
   // Tops
-  kente_top:   'assets/tops/kente_top.png',
-  blazer:      'assets/tops/blazer.png',
-  jumpsuit_top:'assets/tops/jumpsuit_top.png',
-  dress_top:   'assets/tops/dress_top.png',
+  kente_top:   'kente_top.png',
+  blazer:      'blazer.png',
+  jumpsuit_top:'jumpsuit_top.png',
+  dress_top:   'dress_top.png',
   // Bottoms
-  kente_skirt: 'assets/bottoms/kente_skirt.png',
-  jeans:       'assets/bottoms/jeans.png',
-  wide_pants:  'assets/bottoms/wide_pants.png',
-  maxi_skirt:  'assets/bottoms/maxi_skirt.png',
+  kente_skirt: 'kente_skirt.png',
+  jeans:       'jeans.png',
+  wide_pants:  'wide_pants.png',
+  maxi_skirt:  'maxi_skirt.png',
   // Sets (full outfit layers bundled)
-  kente_set:   ['assets/bottoms/kente_skirt.png', 'assets/tops/kente_top.png'],
+  kente_set:   ['kente_skirt.png', 'kente_top.png'],
   // Accessories
-  flower_crown:'assets/accessories/flower_crown.png',
-  headband:    'assets/accessories/headband.png',
-  earrings:    'assets/accessories/earrings.png',
-  shoes:       'assets/accessories/shoes.png',
+  flower_crown:'flower_crown.png',
+  headband:    'headband.png',
+  earrings:    'earrings.png',
+  shoes:       'shoes.png',
 };
 
 function draw() {

@@ -180,7 +180,7 @@
       <div class="section-title">✨ Full Sets</div>
       <div class="btn-row" id="sets-row">
         <button class="outfit-btn" onclick="selectSet('kente_set', this)">
-          <img src="kente_top.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Blue Kente Set" />
+          <img src="assets/kente_top.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Blue Kente Set" />
           <span class="ico" style="display:none">🇬🇭</span>
           <span class="lbl">Blue Kente Set</span>
         </button>
@@ -192,7 +192,7 @@
       <div class="section-title">👚 Tops</div>
       <div class="btn-row" id="tops-row">
         <button class="outfit-btn" onclick="selectLayer('top', 'kente_top', this)">
-          <img src="kente_top.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Kente Top" />
+          <img src="assets/kente_top.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Kente Top" />
           <span class="ico" style="display:none">👘</span>
           <span class="lbl">Kente Top</span>
         </button>
@@ -204,7 +204,7 @@
       <div class="section-title">👗 Bottoms</div>
       <div class="btn-row" id="bottoms-row">
         <button class="outfit-btn" onclick="selectLayer('bottom', 'kente_skirt', this)">
-          <img src="kente_skirt.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Kente Skirt" />
+          <img src="assets/kente_skirt.png" onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="Kente Skirt" />
           <span class="ico" style="display:none">👗</span>
           <span class="lbl">Kente Skirt</span>
         </button>
@@ -254,22 +254,22 @@ function loadImg(src) {
 const ASSETS = {
   base:        'zuri_base.png',
   // Tops
-  kente_top:   'kente_top.png',
-  blazer:      'blazer.png',
-  jumpsuit_top:'jumpsuit_top.png',
-  dress_top:   'dress_top.png',
+  kente_top:   'assets/kente_top.png',
+  blazer:      'assets/blazer.png',
+  jumpsuit_top:'assets/jumpsuit_top.png',
+  dress_top:   'assets/dress_top.png',
   // Bottoms
-  kente_skirt: 'kente_skirt.png',
-  jeans:       'jeans.png',
-  wide_pants:  'wide_pants.png',
-  maxi_skirt:  'maxi_skirt.png',
+  kente_skirt: 'assets/kente_skirt.png',
+  jeans:       'assets/jeans.png',
+  wide_pants:  'assets/wide_pants.png',
+  maxi_skirt:  'assets/maxi_skirt.png',
   // Sets (full outfit layers bundled)
-  kente_set:   ['kente_skirt.png', 'kente_top.png'],
+  kente_set:   ['assets/kente_skirt.png', 'assets/kente_top.png'],
   // Accessories
-  flower_crown:'flower_crown.png',
-  headband:    'headband.png',
-  earrings:    'earrings.png',
-  shoes:       'shoes.png',
+  flower_crown:'assets/flower_crown.png',
+  headband:    'assets/headband.png',
+  earrings:    'assets/earrings.png',
+  shoes:       'assets/shoes.png',
 };
 
 function draw() {

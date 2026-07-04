@@ -607,7 +607,6 @@ loadImg('zuri_base.png'+CB,function(img){
 var unlockedAssets={};
 
 function loadOutfits(){
-  // Load individual pieces
   var pieces=[
     {key:'kente_top',            url:'assets/kente_top.png'},
     {key:'kente_skirt',          url:'assets/kente_skirt.png'},
@@ -625,6 +624,9 @@ function loadOutfits(){
       unlockedAssets['outfit_'+p.key]=true;
       updateOutfitCard(p.key,p.url);
       render();
+    }, function(){
+      // Load failed -- keep card locked, do nothing
+      console.log('Not found: '+p.url);
     });
   });
 }
@@ -745,11 +747,10 @@ function renderOutfits(){
   var items=OUTFIT_CATS[currentOutfitCat]||[];
   items.forEach(function(item){
     var card=document.createElement('div');
-    var isLocked=item.locked||false;
-    if(!item.locked){
-      if(item.key==='kente_set') isLocked=!(outfitImgs['kente_top']&&outfitImgs['kente_skirt']);
-      else isLocked=!outfitImgs[item.key];
-    }
+    // Always use outfitImgs as source of truth -- locked if image not loaded
+    var isLocked;
+    if(item.key==='kente_set') isLocked=!(outfitImgs['kente_top']&&outfitImgs['kente_skirt']);
+    else isLocked=!outfitImgs[item.key];
     // Determine which state slot this item uses
     var slot = currentOutfitCat==='sets' ? 'set' : currentOutfitCat==='tops' ? 'top' : currentOutfitCat==='bottoms' ? 'bottom' : 'top';
     var isActive = state[slot]===item.key;

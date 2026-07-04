@@ -4,244 +4,863 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zuri's Closet</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&family=Libre+Baskerville:ital@0;1&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    min-height: 100vh;
-    background: linear-gradient(160deg, #F9E8EC 0%, #F5DDE8 30%, #F0D5E2 60%, #EDD5C8 85%, #EED0B8 100%);
-    font-family: Georgia, serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem 1rem;
-  }
-  .card {
-    background: rgba(255,250,248,0.92);
-    border-radius: 28px;
-    border: 1.5px solid rgba(220,170,175,0.35);
-    padding: 1.5rem 1.75rem;
-    max-width: 860px;
-    width: 100%;
-    box-shadow: 0 8px 48px rgba(160,80,100,0.1);
-  }
-  .title { text-align: center; margin-bottom: 1.25rem; }
-  .title h1 { font-size: 32px; color: #8B3055; letter-spacing: 1px; }
-  .title p { font-size: 13px; color: #C09098; font-family: 'Segoe UI', sans-serif; margin-top: 4px; }
-  .layout { display: flex; gap: 1.5rem; align-items: flex-start; }
-  .doll-col { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-  .doll-frame {
-    width: 280px; height: 480px;
-    background: linear-gradient(180deg, #FFF0F5 0%, #FDE8D8 100%);
-    border-radius: 24px;
-    border: 1.5px solid rgba(210,160,170,0.3);
-    overflow: hidden; position: relative; transition: background 0.3s;
-  }
-  .doll-frame canvas { position: absolute; top:0; left:0; width:100%; height:100%; }
-  .doll-name { font-size: 22px; color: #8B3055; font-style: italic; }
-  .reset-btn {
-    font-size: 11px; font-family: 'Segoe UI', sans-serif; color: #B07888;
-    background: none; border: 1px solid rgba(180,120,140,0.3);
-    border-radius: 20px; padding: 4px 14px; cursor: pointer; transition: all 0.15s;
-  }
-  .reset-btn:hover { background: #FFF0F5; border-color: #C9559A; color: #8B3055; }
-  .wardrobe-col { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-  .section-title {
-    font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
-    text-transform: uppercase; color: #B07888;
-    font-family: 'Segoe UI', sans-serif;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .section-title::after { content: ''; flex: 1; height: 1px; background: rgba(180,120,140,0.2); }
-  .sub { font-size: 10px; color: #C09AB0; font-family: 'Segoe UI', sans-serif; font-weight: 600; margin-bottom: 3px; }
-  .btn-row { display: flex; flex-wrap: wrap; gap: 6px; }
-  .outfit-btn {
-    width: 70px; height: 70px; border-radius: 14px;
-    border: 1.5px solid rgba(210,160,175,0.35);
-    background: rgba(255,248,251,0.9);
-    cursor: pointer; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 3px;
-    transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s;
-    overflow: hidden; padding: 4px;
-  }
-  .outfit-btn.empty { border-style: dashed; border-color: rgba(210,160,175,0.25); cursor: default; opacity: 0.5; }
-  .outfit-btn:not(.empty):hover { transform: scale(1.08); border-color: #D4709A; box-shadow: 0 4px 14px rgba(180,60,100,0.15); }
-  .outfit-btn.active { border: 2px solid #C9559A; background: #FFE8F4; box-shadow: 0 0 0 3px rgba(201,85,154,0.12); transform: scale(1.05); }
-  .outfit-btn img { width: 52px; height: 52px; object-fit: contain; }
-  .outfit-btn .ico { font-size: 24px; line-height: 1; }
-  .outfit-btn .lbl { font-size: 8px; font-weight: 700; color: #A04070; text-align: center; font-family: 'Segoe UI', sans-serif; line-height: 1.1; }
-  .outfit-btn.empty .lbl { color: #D0A8B8; font-weight: 400; font-style: italic; }
-  .acc-btn {
-    height: 36px; padding: 0 12px; border-radius: 20px;
-    border: 1.5px solid rgba(210,160,175,0.35);
-    background: rgba(255,248,251,0.9);
-    cursor: pointer; display: flex; align-items: center; gap: 5px;
-    font-size: 11px; font-weight: 600; color: #A04070;
-    font-family: 'Segoe UI', sans-serif; transition: all 0.12s;
-  }
-  .acc-btn:hover { border-color: #D4709A; background: #FFF0F7; }
-  .acc-btn.active { border: 2px solid #C9559A; background: #FFE8F4; box-shadow: 0 0 0 3px rgba(201,85,154,0.1); }
-  .bg-swatches { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
-  .swatch { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 1px 5px rgba(0,0,0,0.1); transition: transform 0.12s; }
-  .swatch:hover { transform: scale(1.22); }
-  .swatch.active { border-color: #8B3055; box-shadow: 0 0 0 2.5px rgba(139,48,85,0.3); transform: scale(1.12); }
+:root {
+  --rose:#9B3060;
+  --blush:#F9E8EC;
+  --champagne:#EDD5C8;
+  --gold:#C9A0A8;
+  --gold-lt:#E8C8D0;
+  --ink:#5A2038;
+  --panel-dark:#3A1028;
+  --panel-light:#FFF8F5;
+  --panel-border:rgba(200,160,170,0.2);
+  --panel-title:#E8C8D0;
+  --panel-text:rgba(240,220,228,0.65);
+  --panel-text-on:#E8C8D0;
+  --panel-item-bg:rgba(240,220,228,0.05);
+  --panel-item-on:rgba(200,140,160,0.12);
+  --panel-item-border:rgba(200,160,170,0.18);
+  --panel-item-border-on:#C9A0A8;
+  --right-border:#EED8E0;
+  --right-title:#5A2038;
+  --right-tab-off:#B09098;
+  --right-tab-on:#5A2038;
+  --right-item:#FFF8F5;
+  --right-item-on:#FFF0F5;
+  --right-item-border:#EED8E0;
+  --right-item-border-on:#C9559A;
+  --right-thumb:#EED8E0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100vh;overflow:hidden;background:var(--panel-dark);font-family:'DM Sans',sans-serif;}
+
+/* LANDING */
+#landing{
+  position:fixed;inset:0;z-index:200;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  background:radial-gradient(ellipse at center,#6A2040 0%,#3D1020 50%,#1A0810 100%);
+  transition:opacity 0.8s ease 1.4s;
+}
+#landing.gone{opacity:0;pointer-events:none;}
+.landing-eyebrow{
+  font-family:'DM Sans',sans-serif;font-size:0.58rem;letter-spacing:0.35em;
+  text-transform:uppercase;color:rgba(232,200,210,0.4);margin-bottom:20px;
+}
+.armoire-wrap{
+  position:relative;width:min(320px,85vw);cursor:pointer;
+  filter:drop-shadow(0 40px 80px rgba(0,0,0,0.7));
+}
+.cornice{
+  width:106%;margin-left:-3%;height:18px;
+  background:var(--panel-dark);border:1.5px solid var(--gold-lt);
+  border-radius:2px 2px 0 0;
+  display:flex;align-items:center;justify-content:center;
+}
+.cornice-text{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:0.65rem;letter-spacing:0.25em;color:var(--gold-lt);opacity:0.8;
+}
+.armoire-body{
+  position:relative;background:var(--panel-dark);
+  border:2px solid var(--gold-lt);border-top:none;overflow:hidden;aspect-ratio:0.72;
+}
+.armoire-body::before{
+  content:'';position:absolute;inset:4px;
+  border:0.5px solid rgba(200,160,170,0.2);pointer-events:none;z-index:50;
+}
+.armoire-behind{
+  position:absolute;inset:0;
+  background:linear-gradient(155deg,#F5D8E8 0%,#E8C0D0 45%,#D4A0BC 100%);
+  display:flex;align-items:center;justify-content:center;z-index:1;
+}
+.door-left,.door-right{
+  position:absolute;top:0;width:50%;height:100%;z-index:10;
+  transition:transform 1.2s cubic-bezier(0.77,0,0.18,1);
+  overflow:hidden;background:var(--panel-dark);
+}
+.door-left{left:0;transform-origin:left center;border-right:1px solid rgba(200,160,170,0.2);}
+.door-right{right:0;transform-origin:right center;border-left:1px solid rgba(200,160,170,0.2);}
+.door-left svg,.door-right svg{width:100%;height:100%;display:block;}
+.armoire-wrap.open .door-left{transform:translateX(-100%);}
+.armoire-wrap.open .door-right{transform:translateX(100%);}
+.armoire-feet{display:flex;justify-content:space-between;padding:0 8%;}
+.foot{width:14%;height:14px;background:var(--panel-dark);border:1px solid var(--gold-lt);border-top:none;border-radius:0 0 3px 3px;}
+.open-pill{
+  margin-top:22px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;animation:pillpulse 2s ease-in-out infinite;
+}
+.open-pill-text{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(0.85rem,2.5vw,1rem);letter-spacing:0.1em;
+  color:var(--gold-lt);
+  background:rgba(200,160,170,0.08);
+  border:1.5px solid rgba(200,160,170,0.3);
+  border-radius:50px;padding:10px 28px;display:block;transition:all 0.2s;
+}
+.open-pill:hover .open-pill-text{background:rgba(200,160,170,0.15);border-color:rgba(200,160,170,0.6);}
+@keyframes pillpulse{0%,100%{opacity:0.5;transform:scale(1);}50%{opacity:1;transform:scale(1.04);}}
+
+/* GAME */
+#game{
+  position:fixed;inset:0;
+  display:grid;
+  grid-template-rows:52px 1fr;
+  grid-template-columns:280px 1fr 320px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.7s ease;
+  background:var(--panel-light);
+}
+#game.visible{opacity:1;pointer-events:all;}
+
+/* MASTHEAD */
+.mast{
+  grid-column:1/-1;
+  background:var(--panel-light);
+  border-bottom:1.5px solid var(--panel-dark);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;position:relative;overflow:hidden;
+}
+.mast::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#F9C5D1 0%,#F9C5D1 25%,#FFD700 25%,#FFD700 50%,#C9A0A8 50%,#C9A0A8 75%,#9B3060 75%);
+}
+.mast-logo{font-family:'Playfair Display',serif;font-style:italic;font-weight:700;font-size:1.15rem;color:var(--ink);}
+.mast-center{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:0.9rem;color:var(--ink);opacity:0.85;
+  position:relative;padding:0 24px;
+}
+.mast-center::before,.mast-center::after{content:'';position:absolute;top:50%;width:36px;height:1px;background:var(--gold);opacity:0.6;}
+.mast-center::before{right:100%;margin-right:-20px;}
+.mast-center::after{left:100%;margin-left:-20px;}
+.mast-right{display:flex;align-items:center;gap:12px;}
+.reset-btn{
+  font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;
+  background:var(--ink);border:1.5px solid var(--ink);
+  color:#FFF8F5;padding:9px 22px;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-weight:500;
+  transition:all 0.2s;border-radius:2px;
+}
+.reset-btn:hover{background:var(--rose);border-color:var(--rose);}
+
+/* LEFT PANEL */
+.panel-left{
+  background:var(--panel-dark);
+  border-right:1px solid var(--panel-border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.cat-nav{display:flex;flex-direction:column;border-bottom:1px solid var(--panel-border);flex-shrink:0;}
+.cat-nav-btn{
+  display:flex;align-items:center;gap:12px;padding:15px 18px;
+  border:none;background:none;cursor:pointer;text-align:left;
+  border-left:3px solid transparent;transition:all 0.15s;
+  border-bottom:1px solid var(--panel-border);
+}
+.cat-nav-btn:hover{background:rgba(200,160,170,0.06);}
+.cat-nav-btn.on{background:rgba(200,160,170,0.08);border-left-color:var(--gold-lt);}
+.cat-nav-icon{opacity:0.45;color:rgba(200,160,170,0.6);transition:all 0.15s;display:inline-flex;width:20px;height:20px;flex-shrink:0;}
+.cat-nav-btn.on .cat-nav-icon{opacity:1;color:var(--gold-lt);}
+.cat-nav-label{font-family:'DM Sans',sans-serif;font-weight:500;font-size:0.75rem;letter-spacing:0.06em;color:rgba(200,160,170,0.55);transition:color 0.15s;flex:1;}
+.cat-nav-btn.on .cat-nav-label{color:var(--gold-lt);}
+.cat-nav-count{font-size:0.65rem;font-weight:500;color:rgba(200,160,170,0.4);letter-spacing:0.06em;}
+.cat-nav-btn.on .cat-nav-count{color:var(--gold-lt);}
+.item-scroll{flex:1;overflow-y:auto;padding:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-content:start;}
+.item-scroll::-webkit-scrollbar{width:2px;}
+.item-scroll::-webkit-scrollbar-thumb{background:rgba(200,160,170,0.25);}
+
+/* LEFT CARDS */
+.h-card{
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;
+  gap:6px;padding:10px 6px;
+  border:1px solid var(--panel-item-border);background:var(--panel-item-bg);
+  transition:all 0.15s;
+}
+.h-card:hover{border-color:rgba(200,160,170,0.35);}
+.h-card.on{border-color:var(--gold-lt);background:var(--panel-item-on);}
+.h-card.locked{opacity:0.5;cursor:not-allowed;}
+.h-circle{
+  width:54px;height:54px;border-radius:50%;
+  border:1.5px solid rgba(200,160,170,0.3);
+  background:rgba(200,160,170,0.06);
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;overflow:hidden;
+  color:rgba(200,160,170,0.6);
+}
+.h-circle svg{width:32px;height:32px;}
+.h-circle img{width:100%;height:100%;object-fit:cover;object-position:center top;}
+.h-card.on .h-circle{border-color:var(--gold-lt);}
+.h-name{font-size:0.52rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--panel-text);text-align:center;font-family:'DM Sans',sans-serif;}
+.h-card.on .h-name{color:var(--gold-lt);}
+
+/* STAGE */
+.stage{
+  background:linear-gradient(155deg,#F9E8EC 0%,#F0D0DC 45%,#E8C0D0 100%);
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.stage::after{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(58,16,40,0.15) 100%);}
+.loader{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;
+  background:linear-gradient(155deg,#F9E8EC,#E8C0D0);
+  z-index:10;transition:opacity 0.6s;
+}
+.loader.hidden{opacity:0;pointer-events:none;}
+.loader-bar{width:70px;height:1px;background:rgba(200,160,170,0.2);position:relative;overflow:hidden;}
+.loader-bar::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--rose);animation:loadslide 1.2s ease-in-out infinite;}
+@keyframes loadslide{0%{left:-100%}100%{left:100%}}
+.loader-text{font-family:'Playfair Display',serif;font-style:italic;font-size:0.72rem;color:rgba(155,48,96,0.6);letter-spacing:0.08em;}
+.stage-canvas{display:block;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:2;}
+.stage-label{position:absolute;top:10px;right:10px;background:var(--panel-dark);color:var(--gold-lt);font-size:0.5rem;letter-spacing:0.22em;text-transform:uppercase;padding:4px 10px;font-family:'DM Sans',sans-serif;z-index:5;}
+.stage-reset{position:absolute;top:10px;left:10px;z-index:5;background:rgba(255,248,245,0.18);color:#FFF8F5;border:1px solid rgba(200,160,170,0.4);border-radius:50px;font-size:0.58rem;letter-spacing:0.1em;padding:5px 14px;cursor:pointer;font-family:'Playfair Display',serif;font-style:italic;transition:all 0.2s;}
+.stage-reset:hover{background:rgba(255,248,245,0.28);}
+.stage-look{position:absolute;bottom:0;left:0;right:0;z-index:5;background:linear-gradient(transparent,rgba(58,16,40,0.45));padding:40px 22px 16px;display:flex;align-items:flex-end;justify-content:space-between;}
+.look-name{font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;color:rgba(255,248,245,0.92);}
+.look-sub{font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(200,160,170,0.65);}
+
+/* RIGHT PANEL */
+.panel-right{background:var(--panel-light);border-left:1px solid var(--right-border);display:flex;flex-direction:column;overflow:hidden;}
+.panel-section{display:flex;flex-direction:column;flex:1;overflow:hidden;border-bottom:1px solid var(--right-border);min-height:0;}
+.panel-section:last-child{border-bottom:none;flex:1.3;}
+.section-head{padding:14px 18px 12px;border-bottom:1px solid var(--right-border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+.section-title{font-family:'Playfair Display',serif;font-style:italic;font-size:0.95rem;color:var(--right-title);}
+.outfit-tabs{display:flex;border-bottom:1px solid var(--right-border);flex-shrink:0;}
+.outfit-tab{flex:1;padding:11px 6px;font-size:0.55rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--right-tab-off);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.outfit-tab:hover{color:var(--right-tab-on);}
+.outfit-tab.on{color:var(--right-tab-on);border-bottom-color:var(--rose);}
+.r-scroll{flex:1;overflow-y:auto;padding:12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-content:start;}
+.r-scroll::-webkit-scrollbar{width:2px;}
+.r-scroll::-webkit-scrollbar-thumb{background:var(--right-border);}
+.r-card{cursor:pointer;border:1px solid var(--right-item-border);background:var(--right-item);transition:all 0.15s;position:relative;overflow:hidden;}
+.r-card:hover{border-color:var(--rose);background:#FFF0F5;}
+.r-card.on{border-color:var(--rose);border-width:1.5px;background:var(--right-item-on);}
+.r-card.locked{opacity:0.55;cursor:not-allowed;}
+.r-thumb{aspect-ratio:3/4;background:var(--right-thumb);display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--right-border);overflow:hidden;}
+.r-thumb img{width:100%;height:100%;object-fit:cover;object-position:center top;}
+.r-thumb svg{width:28px;height:28px;opacity:0.5;color:var(--ink);}
+.r-info{padding:8px 10px;}
+.r-name{font-family:'Libre Baskerville',serif;font-style:italic;font-size:0.6rem;color:var(--right-title);line-height:1.3;}
+.r-card.on .r-name{color:var(--rose);}
+.r-tag{font-size:0.52rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--right-tab-off);margin-top:2px;}
+.r-tick{position:absolute;top:4px;right:4px;width:13px;height:13px;border-radius:50%;background:var(--rose);color:#fff;display:none;align-items:center;justify-content:center;font-size:0.45rem;font-weight:700;}
+.r-card.on .r-tick{display:flex;}
+
+/* SHOE SLOTS */
+.shoe-slot{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid transparent;border-bottom:1px solid var(--right-border);cursor:pointer;width:100%;background:none;text-align:left;transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+.shoe-slot:hover{background:var(--blush);}
+.shoe-slot.on{background:var(--blush);border-left:2px solid var(--rose);}
+.shoe-slot.locked{opacity:0.55;cursor:not-allowed;}
+.shoe-slot-icon{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1px solid var(--right-border);display:flex;align-items:center;justify-content:center;background:var(--right-thumb);color:var(--ink);}
+.shoe-slot-icon svg{width:20px;height:20px;opacity:0.6;}
+.shoe-slot.on .shoe-slot-icon{border-color:var(--rose);}
+.shoe-slot-info{flex:1;}
+.shoe-slot-name{font-family:'Libre Baskerville',serif;font-style:italic;font-size:0.68rem;color:var(--right-title);}
+.shoe-slot.on .shoe-slot-name{color:var(--rose);}
+.shoe-slot-tag{font-size:0.5rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--right-tab-off);margin-top:1px;}
+.shoe-dot{width:5px;height:5px;border-radius:50%;border:1px solid var(--right-border);flex-shrink:0;}
+.shoe-slot.on .shoe-dot{background:var(--rose);border-color:var(--rose);}
+.shoe-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0;}
+.shoe-scroll::-webkit-scrollbar{width:2px;}
+.shoe-scroll::-webkit-scrollbar-thumb{background:var(--right-border);}
+
+/* MOBILE */
+@media(max-width:768px){
+  #game{grid-template-rows:44px 1fr auto auto;grid-template-columns:1fr;}
+  .panel-left{display:none;}.panel-right{display:none;}
+  .mast{grid-column:1;padding:0 14px;}.mast-center{display:none;}
+  .mobile-drawer{display:flex !important;flex-direction:column;background:var(--panel-light);border-top:2px solid var(--panel-dark);height:190px;overflow:hidden;}
+  .mobile-drawer::before{content:'';height:3px;flex-shrink:0;background:linear-gradient(90deg,#F9C5D1 0%,#F9C5D1 25%,#FFD700 25%,#FFD700 50%,#C9A0A8 50%,#C9A0A8 75%,#9B3060 75%);}
+  .drawer-title{padding:8px 14px 6px;flex-shrink:0;font-family:'Playfair Display',serif;font-style:italic;font-size:0.82rem;color:var(--right-title);border-bottom:1px solid var(--right-border);}
+  .drawer-items{flex:1;display:flex;gap:8px;padding:10px 14px;overflow-x:auto;align-items:center;}
+  .drawer-items::-webkit-scrollbar{height:2px;}
+  .drawer-items::-webkit-scrollbar-thumb{background:var(--rose);}
+  .mobile-nav{display:flex !important;background:var(--panel-dark);border-top:2px solid var(--rose);}
+  .mobile-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 4px 11px;cursor:pointer;border:none;background:none;position:relative;transition:all 0.15s;}
+  .mobile-nav-btn::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--rose);transform:scaleX(0);transition:transform 0.2s;}
+  .mobile-nav-btn.on::after{transform:scaleX(1);}
+  .mobile-nav-icon{opacity:0.35;color:rgba(200,160,170,0.5);transition:all 0.15s;display:inline-flex;width:20px;height:20px;}
+  .mobile-nav-btn.on .mobile-nav-icon{opacity:1;color:var(--gold-lt);}
+  .mobile-nav-label{font-size:0.48rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(200,160,170,0.3);font-family:'DM Sans',sans-serif;transition:color 0.15s;}
+  .mobile-nav-btn.on .mobile-nav-label{color:var(--gold-lt);}
+}
+.mobile-drawer{display:none;}.mobile-nav{display:none;}
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="title">
-    <h1>✦ Zuri's Closet ✦</h1>
-    <p>Mix, match, and style her up!</p>
+
+<!-- LANDING -->
+<div id="landing">
+  <div class="landing-eyebrow">✦ &nbsp; Zuri's World &nbsp; ✦</div>
+  <div class="armoire-wrap" id="armoireWrap" onclick="openArmoire()" tabindex="0" role="button" aria-label="Open Zuri's Closet" onkeydown="if(event.key==='Enter'||event.key===' ')openArmoire()">
+    <div class="cornice"><span class="cornice-text">Zuri's Closet</span></div>
+    <div class="armoire-body">
+      <div class="armoire-behind"></div>
+      <div class="door-left">
+        <svg viewBox="0 0 190 460" xmlns="http://www.w3.org/2000/svg">
+          <rect width="190" height="460" fill="#3A1028"/>
+          <rect x="0" y="0" width="190" height="2" fill="#1A0810"/>
+          <rect x="0" y="2" width="190" height="13" fill="#C9559A"/>
+          <rect x="0" y="2" width="190" height="1" fill="#1A0810"/>
+          <rect x="0" y="14" width="190" height="1" fill="#1A0810"/>
+          <rect x="0" y="15" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="18" width="190" height="10" fill="#FFD700"/>
+          <rect x="0" y="27" width="190" height="1" fill="#1A0810"/>
+          <rect x="0" y="28" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="31" width="190" height="9" fill="#F4A0C0"/>
+          <rect x="0" y="39" width="190" height="1" fill="#1A0810"/>
+          <rect x="0" y="40" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="43" width="190" height="11" fill="#C9559A"/>
+          <rect x="0" y="53" width="190" height="1" fill="#1A0810"/>
+          <rect x="0" y="54" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="57" width="190" height="8" fill="#FFD700"/>
+          <rect x="0" y="65" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="68" width="190" height="7" fill="#F4A0C0"/>
+          <rect x="0" y="74" width="190" height="1" fill="#1A0810"/>
+          <rect x="0" y="75" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="78" width="190" height="382" fill="#2A0818" opacity="0.8"/>
+          <rect x="8" y="88" width="174" height="160" fill="#200614" rx="1"/>
+          <rect x="8" y="88" width="174" height="160" fill="none" stroke="#E8C8D0" stroke-width="1.2" rx="1"/>
+          <polygon points="95,138 110,153 95,168 80,153" fill="none" stroke="#E8C8D0" stroke-width="1" opacity="0.5"/>
+          <circle cx="95" cy="153" r="4" fill="none" stroke="#E8C8D0" stroke-width="0.8" opacity="0.5"/>
+          <circle cx="95" cy="153" r="1.5" fill="#E8C8D0" opacity="0.5"/>
+          <circle cx="95" cy="130" r="2" fill="#C9559A" opacity="0.6"/>
+          <circle cx="95" cy="176" r="2" fill="#C9559A" opacity="0.6"/>
+          <circle cx="72" cy="153" r="2" fill="#C9559A" opacity="0.6"/>
+          <circle cx="118" cy="153" r="2" fill="#C9559A" opacity="0.6"/>
+          <rect x="8" y="260" width="174" height="185" fill="#200614" rx="1"/>
+          <rect x="8" y="260" width="174" height="185" fill="none" stroke="#E8C8D0" stroke-width="1.2" rx="1"/>
+          <polygon points="95,318 113,336 95,354 77,336" fill="none" stroke="#E8C8D0" stroke-width="1" opacity="0.45"/>
+          <circle cx="95" cy="336" r="4.5" fill="none" stroke="#E8C8D0" stroke-width="0.8" opacity="0.5"/>
+          <circle cx="95" cy="336" r="1.5" fill="#E8C8D0" opacity="0.45"/>
+          <rect x="178" y="220" width="9" height="28" fill="#E8C8D0" rx="4.5"/>
+          <circle cx="182" cy="219" r="6" fill="#E8C8D0"/><circle cx="182" cy="249" r="6" fill="#E8C8D0"/>
+          <circle cx="182" cy="219" r="2.5" fill="#9B3060"/><circle cx="182" cy="249" r="2.5" fill="#9B3060"/>
+        </svg>
+      </div>
+      <div class="door-right">
+        <svg viewBox="0 0 190 460" xmlns="http://www.w3.org/2000/svg">
+          <rect width="190" height="460" fill="#3A1028"/>
+          <rect x="0" y="0" width="190" height="2" fill="#1A0810"/>
+          <rect x="0" y="2" width="190" height="13" fill="#C9559A"/>
+          <rect x="0" y="14" width="190" height="1" fill="#1A0810"/>
+          <rect x="0" y="15" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="18" width="190" height="10" fill="#FFD700"/>
+          <rect x="0" y="27" width="190" height="1" fill="#1A0810"/>
+          <rect x="0" y="28" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="31" width="190" height="9" fill="#F4A0C0"/>
+          <rect x="0" y="39" width="190" height="1" fill="#1A0810"/>
+          <rect x="0" y="40" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="43" width="190" height="11" fill="#C9559A"/>
+          <rect x="0" y="53" width="190" height="1" fill="#1A0810"/>
+          <rect x="0" y="54" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="57" width="190" height="8" fill="#FFD700"/>
+          <rect x="0" y="65" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="68" width="190" height="7" fill="#F4A0C0"/>
+          <rect x="0" y="74" width="190" height="1" fill="#1A0810"/>
+          <rect x="0" y="75" width="190" height="3" fill="#1A0810"/>
+          <rect x="0" y="78" width="190" height="382" fill="#2A0818" opacity="0.8"/>
+          <rect x="8" y="88" width="174" height="160" fill="#200614" rx="1"/>
+          <rect x="8" y="88" width="174" height="160" fill="none" stroke="#E8C8D0" stroke-width="1.2" rx="1"/>
+          <polygon points="95,138 110,153 95,168 80,153" fill="none" stroke="#E8C8D0" stroke-width="1" opacity="0.5"/>
+          <circle cx="95" cy="153" r="1.5" fill="#E8C8D0" opacity="0.5"/>
+          <circle cx="95" cy="130" r="2" fill="#C9559A" opacity="0.6"/>
+          <circle cx="95" cy="176" r="2" fill="#C9559A" opacity="0.6"/>
+          <circle cx="72" cy="153" r="2" fill="#C9559A" opacity="0.6"/>
+          <circle cx="118" cy="153" r="2" fill="#C9559A" opacity="0.6"/>
+          <rect x="8" y="260" width="174" height="185" fill="#200614" rx="1"/>
+          <rect x="8" y="260" width="174" height="185" fill="none" stroke="#E8C8D0" stroke-width="1.2" rx="1"/>
+          <polygon points="95,318 113,336 95,354 77,336" fill="none" stroke="#E8C8D0" stroke-width="1" opacity="0.45"/>
+          <circle cx="95" cy="336" r="1.5" fill="#E8C8D0" opacity="0.45"/>
+          <rect x="3" y="220" width="9" height="28" fill="#E8C8D0" rx="4.5"/>
+          <circle cx="7" cy="219" r="6" fill="#E8C8D0"/><circle cx="7" cy="249" r="6" fill="#E8C8D0"/>
+          <circle cx="7" cy="219" r="2.5" fill="#9B3060"/><circle cx="7" cy="249" r="2.5" fill="#9B3060"/>
+        </svg>
+      </div>
+    </div>
+    <div class="armoire-feet"><div class="foot"></div><div class="foot"></div></div>
   </div>
-  <div class="layout">
-    <div class="doll-col">
-      <div class="doll-frame" id="dollFrame">
-        <canvas id="dollCanvas" width="280" height="480"></canvas>
-      </div>
-      <div class="doll-name">Zuri 🌸</div>
-      <button class="reset-btn" onclick="resetAll()">✦ Start over</button>
-    </div>
-    <div class="wardrobe-col">
-      <div class="section-title">✨ Full Sets</div>
-      <div class="btn-row">
-        <button class="outfit-btn" id="btn-kente-set" onclick="selectSet('kente_set', this)">
-          <span class="ico">🇬🇭</span>
-          <span class="lbl">Blue Kente Set</span>
-        </button>
-        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">coming soon</span></button>
-        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">coming soon</span></button>
-      </div>
-
-      <div class="section-title">👚 Tops</div>
-      <div class="btn-row">
-        <button class="outfit-btn" onclick="selectLayer('top','kente_top',this)">
-          <span class="ico">👘</span><span class="lbl">Kente Top</span>
-        </button>
-        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">blazer</span></button>
-        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">jumpsuit</span></button>
-        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">dress top</span></button>
-      </div>
-
-      <div class="section-title">👗 Bottoms</div>
-      <div class="btn-row">
-        <button class="outfit-btn" onclick="selectLayer('bottom','kente_skirt',this)">
-          <span class="ico">👗</span><span class="lbl">Kente Skirt</span>
-        </button>
-        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">jeans</span></button>
-        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">wide pants</span></button>
-        <button class="outfit-btn empty"><span class="ico">✦</span><span class="lbl">maxi skirt</span></button>
-      </div>
-
-      <div class="section-title">💎 Accessories</div>
-      <div class="btn-row">
-        <button class="acc-btn" onclick="toggleAcc('flower_crown',this)"><span>🌸</span> Flower Crown</button>
-        <button class="acc-btn" onclick="toggleAcc('headband',this)"><span>🎀</span> Headband</button>
-        <button class="acc-btn" onclick="toggleAcc('earrings',this)"><span>💎</span> Earrings</button>
-        <button class="acc-btn" onclick="toggleAcc('shoes',this)"><span>👠</span> Shoes</button>
-      </div>
-
-      <div class="section-title">🎨 Background</div>
-      <div class="bg-swatches" id="swatches"></div>
-    </div>
+  <div class="open-pill" onclick="openArmoire()">
+    <span class="open-pill-text">Open the Closet</span>
   </div>
 </div>
 
+<!-- GAME -->
+<div id="game">
+  <div class="mast">
+    <div class="mast-logo"><em>Zuri's</em> Closet</div>
+    <div class="mast-center">A Cultural Dress-Up Experience</div>
+    <div class="mast-right"><button class="reset-btn" onclick="resetAll()">Reset</button></div>
+  </div>
+
+  <div class="panel-left">
+    <div class="cat-nav" id="cat-nav"></div>
+    <div class="item-scroll" id="left-items"></div>
+  </div>
+
+  <div class="stage">
+    <div class="loader" id="loader">
+      <div class="loader-bar"></div>
+      <div class="loader-text">Zuri is getting ready…</div>
+    </div>
+    <canvas class="stage-canvas" id="stage" oncontextmenu="return false;"></canvas>
+    <div class="stage-label">Zuri</div>
+    <button class="stage-reset" onclick="resetAll()">Reset</button>
+    <div class="stage-look">
+      <div class="look-name" id="look-name"></div>
+      <div class="look-sub" id="look-sub"></div>
+    </div>
+  </div>
+
+  <div class="panel-right">
+    <div class="panel-section">
+      <div class="section-head"><div class="section-title">Outfits</div></div>
+      <div class="outfit-tabs" id="outfit-tabs"></div>
+      <div class="r-scroll" id="outfit-grid"></div>
+    </div>
+    <div class="panel-section">
+      <div class="section-head"><div class="section-title">Shoes</div></div>
+      <div class="shoe-scroll" id="shoe-grid"></div>
+    </div>
+  </div>
+
+  <div class="mobile-drawer" id="mobile-drawer">
+    <div class="drawer-title" id="drawer-title">Outfits</div>
+    <div class="drawer-items" id="drawer-items"></div>
+  </div>
+  <div class="mobile-nav" id="mobile-nav"></div>
+</div>
+
 <script>
-const canvas = document.getElementById('dollCanvas');
-const ctx = canvas.getContext('2d');
-const W = canvas.width, H = canvas.height;
+var CB = '?v=' + Date.now();
 
-const PATHS = {
-  base:         'zuri_base.png',
-  kente_top:    'assets/kente_top.png',
-  kente_skirt:  'assets/kente_skirt.png',
-  flower_crown: 'assets/flower_crown.png',
-  headband:     'assets/headband.png',
-  earrings:     'assets/earrings.png',
-  shoes:        'assets/shoes.png',
+// ── ICONS ──
+var IC = {
+  outfit:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 Q12 5 14 3"/><path d="M10 3 L7 7 L4 6 L4 10 L8 10 L8 22 L16 22 L16 10 L20 10 L20 6 L17 7 L14 3"/></svg>',
+  accents: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5 Q12 3 19 5"/><path d="M5 5 Q4 9 7 11 Q10 13 12 14"/><path d="M19 5 Q20 9 17 11 Q14 13 12 14"/><polygon points="12,14 14,18 12,21 10,18"/></svg>',
+  shoes:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 Q7 16 12 15 Q17 14 20 15 Q22 16 22 18 L22 20 L3 20Z"/><path d="M20 15 Q19 10 21 8"/></svg>',
+  set_ic:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M8 2 L8 10 L16 10 L16 2"/><path d="M8 2 Q12 4 16 2"/><path d="M7 12 Q7 10 12 10 Q17 10 17 12 L19 22 L5 22 Z"/></svg>',
+  dress:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M9 3 Q9 2 12 2 Q15 2 15 3"/><path d="M9 3 L7 8 L5 22 L19 22 L17 8 L15 3"/><path d="M9 3 Q12 5 15 3"/></svg>',
+  jump:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M9 3 Q9 2 12 2 Q15 2 15 3"/><path d="M9 3 L7 8 Q7 12 10 13 L10 20 L14 20 L14 13 Q17 12 17 8 L15 3"/></svg>',
+  top:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M9 3 Q12 5 15 3"/><path d="M9 3 L7 7 L4 6 L4 10 L8 10 L8 16 L16 16 L16 10 L20 10 L20 6 L17 7 L15 3"/></svg>',
+  acc_none:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="10" r="5"/><path d="M8 16 Q12 18 16 16"/></svg>',
+  crown:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M3 18 L6 10 L12 14 L18 10 L21 18 Z"/><path d="M3 18 L21 18"/></svg>',
+  flower:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="17" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="12" r="2"/></svg>',
+  ear:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="7" r="2"/><line x1="12" y1="9" x2="12" y2="16"/><circle cx="12" cy="17" r="1.5"/></svg>',
+  necklace:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M5 5 Q12 3 19 5"/><path d="M5 5 Q4 9 7 11 Q10 13 12 14"/><path d="M19 5 Q20 9 17 11 Q14 13 12 14"/><polygon points="12,14 14,18 12,21 10,18"/></svg>',
+  heel_ic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M3 18 Q7 16 12 15 Q17 14 20 15 Q22 16 22 18 L22 20 L3 20Z"/><path d="M20 15 Q19 10 21 8"/></svg>',
+  flat_ic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M3 16 Q8 14 16 14 Q20 14 21 16 L21 18 L3 18 Z"/></svg>',
+  boot_ic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M10 2 L10 14 Q10 16 13 16 L20 16 L20 18 L8 18 Q5 18 5 16 L5 15 L10 14"/><path d="M10 2 L12 2 L12 14"/></svg>',
+  slip_ic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M3 15 Q8 12 16 13 Q20 13 21 15 L21 17 L3 17 Z"/></svg>',
 };
 
-const SETS = {
-  kente_set: ['kente_skirt', 'kente_top'],
+// ── DATA ──
+// Outfit categories -- add more as you generate PNGs
+var OUTFIT_CATS = {
+  sets: [
+    {key:'kente_set',   label:'Blue Kente Set',   tag:'Cultural · Formal',    url:'assets/kente_set.png',   icon:'set_ic'},
+  ],
+  dresses: [
+    {key:'dress_1',     label:'Coming Soon',       tag:'',                     url:'assets/dress_1.png',     icon:'dress', locked:true},
+  ],
+  tops: [
+    {key:'kente_top',   label:'Kente Top',         tag:'One Shoulder · Bold',  url:'assets/kente_top.png',   icon:'top'},
+    {key:'jumpsuit',    label:'Jumpsuit',           tag:'Coming Soon',          url:'assets/jumpsuit.png',    icon:'jump', locked:true},
+  ],
 };
 
-const state = { top: null, bottom: null, set: null, accessories: new Set() };
+var ACCENT_ITEMS = [
+  {key:'none',         label:'None',          icon:'acc_none'},
+  {key:'flower_crown', label:'Flower Crown',  icon:'flower',   locked:true},
+  {key:'headband',     label:'Headband',      icon:'ear',      locked:true},
+  {key:'earrings',     label:'Earrings',      icon:'ear',      locked:true},
+  {key:'necklace',     label:'Necklace',      icon:'necklace', locked:true},
+];
 
-// Preload all images
-const imgs = {};
-function getImg(key) {
-  if (!imgs[key]) {
-    const img = new Image();
-    img.src = PATHS[key];
-    img.onload = draw;
-    imgs[key] = img;
-  }
-  return imgs[key];
+var SHOE_DATA = [
+  {key:'heels',    label:'Heels',       tag:'Strappy · Gold',    url:'assets/heels.png',    icon:'heel_ic'},
+  {key:'flats',    label:'Flats',       tag:'Beaded · Flat',     url:'assets/flats.png',    icon:'flat_ic'},
+  {key:'boots',    label:'Boots',       tag:'Ankle · Bold',      url:'assets/boots.png',    icon:'boot_ic'},
+  {key:'sneakers', label:'Sneakers',    tag:'Casual · Fresh',    url:'assets/sneakers.png', icon:'flat_ic'},
+];
+
+var LEFT_CATS = [
+  {key:'accents', label:'Accessories', count:'4', icon:'accents'},
+];
+
+// ── STATE ──
+var state = {accent:null, outfit:null, bottom:null, shoe:null};
+var baseImg=null, accentImgs={}, outfitImgs={}, bottomImgs={}, shoeImgs={};
+var stripCache={}, transparencyCache={};
+var currentOutfitCat='sets', currentMobileCat='outfits';
+
+// ── CANVAS ──
+var canvas = document.getElementById('stage');
+var ctx = canvas.getContext('2d');
+var DW=520, DH=780;
+function sizeCanvas(){
+  var stage=canvas.parentElement;
+  var h=stage.clientHeight||(window.innerHeight-52);
+  var w=Math.round(h*(DW/DH));
+  canvas.style.height=h+'px';canvas.style.width=w+'px';
+}
+canvas.width=DW*2;canvas.height=DH*2;ctx.scale(2,2);
+window.addEventListener('load',function(){sizeCanvas();render();});
+window.addEventListener('resize',sizeCanvas);
+if(document.readyState==='complete'){sizeCanvas();}
+
+// ── DRAW ENGINE (same as Adoma) ──
+function loadImg(src,cb,errCb){var img=new Image();img.crossOrigin='anonymous';img.onload=function(){cb(img);};img.onerror=function(){if(errCb)errCb();};img.src=src;}
+
+function drawLayer(img,W,H,ox,oy){
+  var iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+  if(!iw||!ih)return;
+  var scale=W/iw;
+  var dw=iw*scale,dh=ih*scale;
+  var dx=(W-dw)/2+(ox||0);
+  var dy=(oy||0);
+  ctx.drawImage(img,0,0,iw,ih,dx,dy,dw,dh);
 }
 
-function draw() {
-  ctx.clearRect(0, 0, W, H);
-  const base = getImg('base');
-  if (base.complete && base.naturalWidth > 0) ctx.drawImage(base, 0, 0, W, H);
+function stripAndDraw(img,W,H,ox,oy){
+  var iw=img.naturalWidth,ih=img.naturalHeight;
+  if(!iw||!ih)return;
+  var k=iw+'x'+ih+img.src.slice(-20);
+  if(!stripCache[k]){
+    var off=document.createElement('canvas');off.width=iw;off.height=ih;
+    var c2=off.getContext('2d');c2.drawImage(img,0,0);
+    var d=c2.getImageData(0,0,iw,ih),px=d.data;
+    for(var n=0;n<px.length;n+=4){if(px[n]>235&&px[n+1]>235&&px[n+2]>235)px[n+3]=0;}
+    c2.putImageData(d,0,0);stripCache[k]=off;
+  }
+  ctx.drawImage(stripCache[k],0,0,stripCache[k].width,stripCache[k].height,(ox||0),(oy||0),W,H);
+}
 
-  if (state.set) {
-    SETS[state.set].forEach(key => {
-      const img = getImg(key);
-      if (img.complete && img.naturalWidth > 0) ctx.drawImage(img, 0, 0, W, H);
-    });
-  } else {
-    if (state.bottom) { const img = getImg(state.bottom); if (img.complete && img.naturalWidth > 0) ctx.drawImage(img, 0, 0, W, H); }
-    if (state.top)    { const img = getImg(state.top);    if (img.complete && img.naturalWidth > 0) ctx.drawImage(img, 0, 0, W, H); }
+function checkTransparency(img,key,cat){
+  var ck=cat+'_'+key;
+  if(transparencyCache[ck]!==undefined)return transparencyCache[ck];
+  var iw=img.naturalWidth,ih=img.naturalHeight;
+  if(!iw||!ih)return false;
+  var off=document.createElement('canvas');off.width=iw;off.height=ih;
+  var c2=off.getContext('2d');c2.drawImage(img,0,0);
+  var corners=[[0,0],[iw-1,0],[0,ih-1],[iw-1,ih-1]];
+  var hasA=corners.some(function(c){return c2.getImageData(c[0],c[1],1,1).data[3]<200;});
+  transparencyCache[ck]=hasA;return hasA;
+}
+
+function render(){
+  var W=DW,H=DH;ctx.clearRect(0,0,W,H);
+  // BG gradient
+  var g=ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,'#F9E8EC');g.addColorStop(0.5,'#F0D0DC');g.addColorStop(1,'#E8C0D0');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+
+  function draw(img,key,cat){
+    if(!img)return;
+    if(checkTransparency(img,key,cat))drawLayer(img,W,H);
+    else stripAndDraw(img,W,H);
   }
 
-  state.accessories.forEach(key => {
-    if (PATHS[key]) { const img = getImg(key); if (img.complete && img.naturalWidth > 0) ctx.drawImage(img, 0, 0, W, H); }
+  // Draw order: base -> bottom -> outfit top -> accent -> shoe
+  if(baseImg)draw(baseImg,'base','base');
+
+  // Kente set draws both layers
+  if(state.outfit==='kente_set'){
+    if(outfitImgs['kente_skirt'])draw(outfitImgs['kente_skirt'],'kente_skirt','outfit');
+    if(outfitImgs['kente_top'])draw(outfitImgs['kente_top'],'kente_top','outfit');
+  } else if(state.outfit&&outfitImgs[state.outfit]){
+    draw(outfitImgs[state.outfit],state.outfit,'outfit');
+  }
+
+  if(state.accent&&accentImgs[state.accent])draw(accentImgs[state.accent],state.accent,'accent');
+  if(state.shoe&&shoeImgs[state.shoe])draw(shoeImgs[state.shoe],state.shoe,'shoe');
+}
+
+// ── LOAD BASE ──
+loadImg('zuri_base.png'+CB,function(img){
+  baseImg=img;
+  checkTransparency(img,'base','base');
+  render();
+  var l=document.getElementById('loader');if(l)l.classList.add('hidden');
+},function(){
+  var l=document.getElementById('loader');if(l)l.classList.add('hidden');
+  render();
+});
+
+// ── LOAD OUTFIT ASSETS ──
+var unlockedAssets={};
+
+function loadOutfits(){
+  // Load individual pieces
+  var pieces=[
+    {key:'kente_top',  url:'assets/kente_top.png'},
+    {key:'kente_skirt',url:'assets/kente_skirt.png'},
+    {key:'dress_1',    url:'assets/dress_1.png'},
+    {key:'jumpsuit',   url:'assets/jumpsuit.png'},
+  ];
+  pieces.forEach(function(p){
+    loadImg(p.url+CB,function(img){
+      outfitImgs[p.key]=img;
+      checkTransparency(img,p.key,'outfit');
+      unlockedAssets['outfit_'+p.key]=true;
+      updateOutfitCard(p.key,p.url);
+      render();
+    });
   });
 }
 
-function selectSet(id, btn) {
-  state.set = state.set === id ? null : id;
-  state.top = null; state.bottom = null;
-  document.querySelectorAll('.outfit-btn').forEach(b => b.classList.remove('active'));
-  if (state.set) { btn.classList.add('active'); SETS[id].forEach(k => getImg(k)); }
-  draw();
+function loadAccents(){
+  var pieces=[
+    {key:'flower_crown',url:'assets/flower_crown.png'},
+    {key:'headband',    url:'assets/headband.png'},
+    {key:'earrings',    url:'assets/earrings.png'},
+    {key:'necklace',    url:'assets/necklace.png'},
+  ];
+  pieces.forEach(function(p){
+    loadImg(p.url+CB,function(img){
+      accentImgs[p.key]=img;
+      checkTransparency(img,p.key,'accent');
+      unlockedAssets['accent_'+p.key]=true;
+      // Update accent card
+      ACCENT_ITEMS.forEach(function(item){if(item.key===p.key)item.locked=false;});
+      document.querySelectorAll('[data-cat="accents"][data-key="'+p.key+'"]').forEach(function(el){el.classList.remove('locked');});
+      render();
+    });
+  });
 }
 
-function selectLayer(type, id, btn) {
-  state.set = null;
-  document.querySelectorAll('.outfit-btn').forEach(b => b.classList.remove('active'));
-  state[type] = state[type] === id ? null : id;
-  if (state[type]) btn.classList.add('active');
-  draw();
+function loadShoes(){
+  SHOE_DATA.forEach(function(item){
+    loadImg(item.url+CB,function(img){
+      shoeImgs[item.key]=img;
+      checkTransparency(img,item.key,'shoe');
+      document.querySelectorAll('.shoe-slot[data-key="'+item.key+'"]').forEach(function(s){
+        s.classList.remove('locked');
+        var icon=s.querySelector('.shoe-slot-icon');
+        if(icon){var i=new Image();i.src=item.url;i.style.cssText='width:100%;height:100%;object-fit:cover;object-position:center bottom;';icon.innerHTML='';icon.appendChild(i);}
+      });
+      render();
+    });
+  });
 }
 
-function toggleAcc(id, btn) {
-  if (state.accessories.has(id)) { state.accessories.delete(id); btn.classList.remove('active'); }
-  else { state.accessories.add(id); btn.classList.add('active'); getImg(id); }
-  draw();
+function updateOutfitCard(key,url){
+  document.querySelectorAll('.r-card[data-key="'+key+'"]').forEach(function(c){
+    c.classList.remove('locked');
+    var thumb=c.querySelector('.r-thumb');
+    if(thumb){var i=new Image();i.src=url;i.style.cssText='width:100%;height:100%;object-fit:cover;object-position:center top;';thumb.innerHTML='';thumb.appendChild(i);}
+  });
+  // Also unlock kente_set card when both pieces load
+  if((outfitImgs['kente_top']||key==='kente_top')&&(outfitImgs['kente_skirt']||key==='kente_skirt')){
+    document.querySelectorAll('.r-card[data-key="kente_set"]').forEach(function(c){
+      c.classList.remove('locked');
+      var thumb=c.querySelector('.r-thumb');
+      if(thumb&&outfitImgs['kente_top']){var i=new Image();i.src='assets/kente_top.png';i.style.cssText='width:100%;height:100%;object-fit:cover;object-position:center top;';thumb.innerHTML='';thumb.appendChild(i);}
+    });
+  }
 }
 
-function resetAll() {
-  state.top = null; state.bottom = null; state.set = null; state.accessories.clear();
-  document.querySelectorAll('.outfit-btn, .acc-btn').forEach(b => b.classList.remove('active'));
-  draw();
+loadOutfits();loadAccents();loadShoes();
+
+// ── LEFT PANEL (Accessories only) ──
+var catNav=document.getElementById('cat-nav');
+LEFT_CATS.forEach(function(cat,i){
+  var btn=document.createElement('button');
+  btn.className='cat-nav-btn'+(i===0?' on':'');
+  btn.innerHTML='<span class="cat-nav-icon">'+IC[cat.icon]+'</span><span class="cat-nav-label">'+cat.label+'</span><span class="cat-nav-count">'+cat.count+'</span>';
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.cat-nav-btn').forEach(function(b){b.classList.remove('on');});
+    btn.classList.add('on');
+    renderLeft(cat.key);
+  });
+  catNav.appendChild(btn);
+});
+
+function renderLeft(cat){
+  var container=document.getElementById('left-items');
+  container.innerHTML='';
+  var items=ACCENT_ITEMS;
+  items.forEach(function(item){
+    var isSelected=state.accent===item.key||(item.key==='none'&&!state.accent);
+    var card=document.createElement('div');
+    card.className='h-card'+(item.locked?' locked':'')+(isSelected?' on':'');
+    card.setAttribute('data-cat',cat);card.setAttribute('data-key',item.key);
+    card.setAttribute('role','button');card.setAttribute('tabindex','0');
+    card.innerHTML='<div class="h-circle" id="thumb-'+cat+'-'+item.key+'">'+IC[item.icon]+'</div><div class="h-name">'+item.label+'</div>';
+    if(!item.locked){
+      (function(k){card.addEventListener('click',function(){
+        state.accent=(k==='none')?null:k;
+        renderLeft(cat);updateLook();render();
+      });})(item.key);
+    } else {
+      (function(k){card.addEventListener('click',function(){
+        if(unlockedAssets['accent_'+k]){
+          state.accent=k;
+          ACCENT_ITEMS.forEach(function(i){if(i.key===k)i.locked=false;});
+          renderLeft(cat);updateLook();render();
+        }
+      });})(item.key);
+    }
+    container.appendChild(card);
+  });
 }
+renderLeft('accents');
 
-// Preload base immediately
-getImg('base');
+// ── OUTFIT TABS ──
+var outfitTabBar=document.getElementById('outfit-tabs');
+var outfitGrid=document.getElementById('outfit-grid');
+['sets','dresses','tops'].forEach(function(cat,i){
+  var tab=document.createElement('button');
+  tab.className='outfit-tab'+(i===0?' on':'');
+  tab.textContent=cat.charAt(0).toUpperCase()+cat.slice(1);
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.outfit-tab').forEach(function(t){t.classList.remove('on');});
+    tab.classList.add('on');currentOutfitCat=cat;renderOutfits();
+  });
+  outfitTabBar.appendChild(tab);
+});
 
-// Background swatches
-const SWATCHES = [
-  { label:'Blush Champagne', bg:'linear-gradient(180deg,#FFF0F5 0%,#FDE8D8 100%)', d:'#F5D8E0' },
-  { label:'Lavender',        bg:'linear-gradient(180deg,#F5F0FF 0%,#E4D8F8 100%)', d:'#E8DAFF' },
-  { label:'Mint',            bg:'linear-gradient(180deg,#F0FFF8 0%,#D8F0E8 100%)', d:'#D0F0E4' },
-  { label:'Sky',             bg:'linear-gradient(180deg,#EDF6FF 0%,#D5E8F8 100%)', d:'#C8E4FF' },
-  { label:'Peach',           bg:'linear-gradient(180deg,#FFF4EE 0%,#F8E0D0 100%)', d:'#F8D8C0' },
-  { label:'White',           bg:'#FFFFFF', d:'#FFFFFF' },
+function renderOutfits(){
+  outfitGrid.innerHTML='';
+  var items=OUTFIT_CATS[currentOutfitCat]||[];
+  items.forEach(function(item){
+    var card=document.createElement('div');
+    var isLocked=item.locked||(item.key!=='kente_set'&&!outfitImgs[item.key]&&item.key!=='kente_top');
+    // kente_set unlocks when both pieces load
+    if(item.key==='kente_set') isLocked=!(outfitImgs['kente_top']&&outfitImgs['kente_skirt']);
+    card.className='r-card'+(isLocked?' locked':'')+(state.outfit===item.key?' on':'');
+    card.dataset.key=item.key;
+    card.setAttribute('role','button');card.setAttribute('tabindex','0');
+    var thumb=document.createElement('div');thumb.className='r-thumb';
+    if(!isLocked&&(outfitImgs[item.key]||item.key==='kente_set')){
+      var img=new Image();
+      img.src=(item.key==='kente_set')?'assets/kente_top.png':item.url;
+      img.style.cssText='width:100%;height:100%;object-fit:cover;object-position:center top;';
+      thumb.appendChild(img);
+    } else {thumb.innerHTML=IC[item.icon];}
+    var info=document.createElement('div');info.className='r-info';
+    info.innerHTML='<div class="r-name">'+item.label+'</div><div class="r-tag">'+item.tag+'</div>';
+    var tick=document.createElement('div');tick.className='r-tick';tick.textContent='✓';
+    card.appendChild(thumb);card.appendChild(info);card.appendChild(tick);
+    (function(it){card.addEventListener('click',function(){
+      if(card.classList.contains('locked'))return;
+      state.outfit=(state.outfit===it.key)?null:it.key;
+      renderOutfits();updateLook();render();
+    });})(item);
+    outfitGrid.appendChild(card);
+  });
+}
+renderOutfits();
+
+// ── SHOE SLOTS ──
+var shoeGrid=document.getElementById('shoe-grid');
+var shoeNone=document.createElement('button');
+shoeNone.className='shoe-slot on';shoeNone.id='shoe-none';
+shoeNone.innerHTML='<div class="shoe-slot-icon">'+IC.slip_ic+'</div><div class="shoe-slot-info"><div class="shoe-slot-name">Barefoot</div></div><div class="shoe-dot"></div>';
+shoeNone.addEventListener('click',function(){state.shoe=null;renderShoes();updateLook();render();});
+shoeGrid.appendChild(shoeNone);
+
+function renderShoes(){
+  document.querySelectorAll('.shoe-slot[data-key]').forEach(function(s){s.classList.toggle('on',state.shoe===s.dataset.key);});
+  document.getElementById('shoe-none').classList.toggle('on',!state.shoe);
+}
+SHOE_DATA.forEach(function(item){
+  var slot=document.createElement('button');
+  slot.className='shoe-slot locked';slot.dataset.key=item.key;
+  slot.innerHTML='<div class="shoe-slot-icon">'+IC[item.icon]+'</div><div class="shoe-slot-info"><div class="shoe-slot-name">'+item.label+'</div><div class="shoe-slot-tag">'+item.tag+'</div></div><div class="shoe-dot"></div>';
+  (function(it){slot.addEventListener('click',function(){
+    if(slot.classList.contains('locked'))return;
+    state.shoe=(state.shoe===it.key)?null:it.key;
+    renderShoes();updateLook();render();
+  });})(item);
+  shoeGrid.appendChild(slot);
+});
+
+// ── MOBILE NAV ──
+var mobileNav=document.getElementById('mobile-nav');
+var MOB_CATS=[
+  {key:'outfits',label:'Outfits',icon:'outfit'},
+  {key:'accents',label:'Accents',icon:'accents'},
+  {key:'shoes',  label:'Shoes',  icon:'shoes'},
 ];
-const dollFrame = document.getElementById('dollFrame');
-document.getElementById('swatches').innerHTML = SWATCHES.map((s,i) =>
-  `<div class="swatch${i===0?' active':''}" title="${s.label}" style="background:${s.d}" onclick="document.querySelectorAll('.swatch').forEach(x=>x.classList.remove('active'));this.classList.add('active');dollFrame.style.background='${s.bg}'"></div>`
-).join('');
+MOB_CATS.forEach(function(cat,i){
+  var btn=document.createElement('button');
+  btn.className='mobile-nav-btn'+(i===0?' on':'');
+  btn.innerHTML='<span class="mobile-nav-icon">'+IC[cat.icon]+'</span><span class="mobile-nav-label">'+cat.label+'</span>';
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.mobile-nav-btn').forEach(function(b){b.classList.remove('on');});
+    btn.classList.add('on');currentMobileCat=cat.key;renderMobileDrawer(cat.key);
+  });
+  mobileNav.appendChild(btn);
+});
+
+function renderMobileDrawer(cat){
+  document.getElementById('drawer-title').textContent=cat.charAt(0).toUpperCase()+cat.slice(1);
+  var container=document.getElementById('drawer-items');container.innerHTML='';
+  if(cat==='outfits'){
+    var all=OUTFIT_CATS.sets.concat(OUTFIT_CATS.dresses).concat(OUTFIT_CATS.tops);
+    all.forEach(function(item){
+      var isLocked=item.key==='kente_set'?!(outfitImgs['kente_top']&&outfitImgs['kente_skirt']):(item.locked||!outfitImgs[item.key]);
+      var card=document.createElement('div');
+      card.className='h-card'+(isLocked?' locked':'')+(state.outfit===item.key?' on':'');
+      card.style.cssText='flex-shrink:0;min-width:60px;';
+      card.innerHTML='<div class="h-circle">'+IC[item.icon]+'</div><div class="h-name">'+item.label+'</div>';
+      if(!isLocked){(function(k){card.addEventListener('click',function(){state.outfit=(state.outfit===k)?null:k;renderMobileDrawer(cat);updateLook();render();});})(item.key);}
+      container.appendChild(card);
+    });
+  } else if(cat==='shoes'){
+    SHOE_DATA.forEach(function(item){
+      var card=document.createElement('div');
+      card.className='h-card'+(shoeImgs[item.key]?'':' locked')+(state.shoe===item.key?' on':'');
+      card.style.cssText='flex-shrink:0;min-width:60px;';
+      card.innerHTML='<div class="h-circle">'+IC[item.icon]+'</div><div class="h-name">'+item.label+'</div>';
+      if(shoeImgs[item.key]){(function(k){card.addEventListener('click',function(){state.shoe=(state.shoe===k)?null:k;renderMobileDrawer(cat);updateLook();render();});})(item.key);}
+      container.appendChild(card);
+    });
+  } else {
+    ACCENT_ITEMS.forEach(function(item){
+      var card=document.createElement('div');
+      card.className='h-card'+(item.locked?' locked':'')+(state.accent===item.key||(item.key==='none'&&!state.accent)?' on':'');
+      card.style.cssText='flex-shrink:0;min-width:60px;';
+      card.innerHTML='<div class="h-circle">'+IC[item.icon]+'</div><div class="h-name">'+item.label+'</div>';
+      if(!item.locked){(function(k){card.addEventListener('click',function(){state.accent=(k==='none')?null:k;renderMobileDrawer(cat);updateLook();render();});})(item.key);}
+      container.appendChild(card);
+    });
+  }
+}
+renderMobileDrawer('outfits');
+
+// ── LOOK UPDATE ──
+function updateLook(){
+  var parts=[],subs=[];
+  if(state.outfit){
+    var all=OUTFIT_CATS.sets.concat(OUTFIT_CATS.dresses).concat(OUTFIT_CATS.tops);
+    var found=all.find(function(i){return i.key===state.outfit;});
+    if(found){parts.push(found.label);if(found.tag)subs.push(found.tag);}
+  }
+  document.getElementById('look-name').innerHTML=parts.length?'<em>'+parts.join(' · ')+'</em>':'';
+  document.getElementById('look-sub').textContent=subs.join(' · ');
+}
+
+// ── RESET ──
+function resetAll(){
+  if(!confirm('Reset look?'))return;
+  state={accent:null,outfit:null,bottom:null,shoe:null};
+  renderLeft('accents');renderOutfits();renderShoes();
+  renderMobileDrawer(currentMobileCat);updateLook();render();
+}
+
+// ── ARMOIRE ──
+function openArmoire(){
+  var wrap=document.getElementById('armoireWrap');
+  if(wrap.classList.contains('open'))return;
+  wrap.classList.add('open');
+  setTimeout(function(){
+    document.getElementById('landing').classList.add('gone');
+    document.getElementById('game').classList.add('visible');
+  },1300);
+}
 </script>
 </body>
 </html>

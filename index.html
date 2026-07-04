@@ -623,9 +623,9 @@ function loadOutfits(){
       checkTransparency(img,p.key,'outfit');
       unlockedAssets['outfit_'+p.key]=true;
       updateOutfitCard(p.key,p.url);
+      renderOutfits();
       render();
     }, function(){
-      // Load failed -- keep card locked, do nothing
       console.log('Not found: '+p.url);
     });
   });

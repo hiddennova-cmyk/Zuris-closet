@@ -464,14 +464,16 @@ var OUTFIT_CATS = {
     {key:'set_3',       label:'Coming Soon',       tag:'',                     url:'assets/set_3.png',       icon:'set_ic', locked:true},
   ],
   tops: [
-    {key:'kente_top',   label:'Kente Top',         tag:'One Shoulder · Bold',  url:'assets/kente_top.png',   icon:'top'},
-    {key:'blazer',      label:'Blazer',            tag:'Coming Soon',          url:'assets/blazer.png',      icon:'top',   locked:true},
-    {key:'jumpsuit',    label:'Jumpsuit',           tag:'Coming Soon',          url:'assets/jumpsuit.png',    icon:'jump',  locked:true},
+    {key:'kente_top',      label:'Kente Top',       tag:'One Shoulder · Bold',  url:'assets/kente_top.png',         icon:'top'},
+    {key:'white-blouse',   label:'White Blouse',    tag:'Classic · Clean',      url:'assets/white-blouse.png',      icon:'top'},
+    {key:'blazer',         label:'Blazer',          tag:'Coming Soon',          url:'assets/blazer.png',            icon:'top',  locked:true},
+    {key:'jumpsuit',       label:'Jumpsuit',        tag:'Coming Soon',          url:'assets/jumpsuit.png',          icon:'jump', locked:true},
   ],
   bottoms: [
-    {key:'kente_skirt', label:'Kente Skirt',       tag:'Full · Bow Detail',    url:'assets/kente_skirt.png', icon:'dress'},
-    {key:'jeans',       label:'Jeans',             tag:'Coming Soon',          url:'assets/jeans.png',       icon:'dress', locked:true},
-    {key:'wide_pants',  label:'Wide Pants',        tag:'Coming Soon',          url:'assets/wide_pants.png',  icon:'dress', locked:true},
+    {key:'kente_skirt',       label:'Kente Skirt',      tag:'Full · Bow Detail',  url:'assets/kente_skirt.png',          icon:'dress'},
+    {key:'purple-kente_skirt',label:'Purple Kente Skirt',tag:'Full · Regal',      url:'assets/purple-kente_skirt.png',   icon:'dress'},
+    {key:'jeans',             label:'Jeans',            tag:'Coming Soon',        url:'assets/jeans.png',                icon:'dress', locked:true},
+    {key:'wide_pants',        label:'Wide Pants',       tag:'Coming Soon',        url:'assets/wide_pants.png',           icon:'dress', locked:true},
   ],
   dresses: [
     {key:'dress_1',     label:'Coming Soon',       tag:'',                     url:'assets/dress_1.png',     icon:'dress', locked:true},
@@ -579,9 +581,6 @@ function render(){
     // Set: skirt first then top
     if(outfitImgs['kente_skirt'])draw(outfitImgs['kente_skirt'],'kente_skirt','outfit');
     if(outfitImgs['kente_top'])draw(outfitImgs['kente_top'],'kente_top','outfit');
-  } else if(state.outfit==='kente_skirt'){
-    // Individual bottom
-    if(outfitImgs['kente_skirt'])draw(outfitImgs['kente_skirt'],'kente_skirt','outfit');
   } else if(state.outfit&&outfitImgs[state.outfit]){
     draw(outfitImgs[state.outfit],state.outfit,'outfit');
   }
@@ -607,10 +606,12 @@ var unlockedAssets={};
 function loadOutfits(){
   // Load individual pieces
   var pieces=[
-    {key:'kente_top',  url:'assets/kente_top.png'},
-    {key:'kente_skirt',url:'assets/kente_skirt.png'},
-    {key:'dress_1',    url:'assets/dress_1.png'},
-    {key:'jumpsuit',   url:'assets/jumpsuit.png'},
+    {key:'kente_top',          url:'assets/kente_top.png'},
+    {key:'kente_skirt',        url:'assets/kente_skirt.png'},
+    {key:'white-blouse',       url:'assets/white-blouse.png'},
+    {key:'purple-kente_skirt', url:'assets/purple-kente_skirt.png'},
+    {key:'dress_1',            url:'assets/dress_1.png'},
+    {key:'jumpsuit',           url:'assets/jumpsuit.png'},
   ];
   pieces.forEach(function(p){
     loadImg(p.url+CB,function(img){

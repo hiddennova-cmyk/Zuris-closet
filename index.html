@@ -501,8 +501,8 @@ var LEFT_CATS = [
 ];
 
 // ── STATE ──
-var state = {accent:null, outfit:null, bottom:null, shoe:null};
-var baseImg=null, accentImgs={}, outfitImgs={}, bottomImgs={}, shoeImgs={};
+var state = {accent:null, set:null, top:null, bottom:null, shoe:null};
+var baseImg=null, accentImgs={}, outfitImgs={}, shoeImgs={};
 var stripCache={}, transparencyCache={};
 var currentOutfitCat='sets', currentMobileCat='outfits';
 
@@ -573,16 +573,17 @@ function render(){
     else stripAndDraw(img,W,H);
   }
 
-  // Draw order: base -> bottom -> outfit top -> accent -> shoe
+  // Draw order: base -> bottom -> top -> accent -> shoe
   if(baseImg)draw(baseImg,'base','base');
 
-  // Draw outfit layers
-  if(state.outfit==='kente_set'){
-    // Set: skirt first then top
+  if(state.set==='kente_set'){
+    // Full set: skirt first then top
     if(outfitImgs['kente_skirt'])draw(outfitImgs['kente_skirt'],'kente_skirt','outfit');
     if(outfitImgs['kente_top'])draw(outfitImgs['kente_top'],'kente_top','outfit');
-  } else if(state.outfit&&outfitImgs[state.outfit]){
-    draw(outfitImgs[state.outfit],state.outfit,'outfit');
+  } else {
+    // Individual pieces
+    if(state.bottom&&outfitImgs[state.bottom])draw(outfitImgs[state.bottom],state.bottom,'outfit');
+    if(state.top&&outfitImgs[state.top])draw(outfitImgs[state.top],state.top,'outfit');
   }
 
   if(state.accent&&accentImgs[state.accent])draw(accentImgs[state.accent],state.accent,'accent');
@@ -745,7 +746,10 @@ function renderOutfits(){
       if(item.key==='kente_set') isLocked=!(outfitImgs['kente_top']&&outfitImgs['kente_skirt']);
       else isLocked=!outfitImgs[item.key];
     }
-    card.className='r-card'+(isLocked?' locked':'')+(state.outfit===item.key?' on':'');
+    // Determine which state slot this item uses
+    var slot = currentOutfitCat==='sets' ? 'set' : currentOutfitCat==='tops' ? 'top' : currentOutfitCat==='bottoms' ? 'bottom' : 'top';
+    var isActive = state[slot]===item.key;
+    card.className='r-card'+(isLocked?' locked':'')+(isActive?' on':'');
     card.dataset.key=item.key;
     card.setAttribute('role','button');card.setAttribute('tabindex','0');
     var thumb=document.createElement('div');thumb.className='r-thumb';
@@ -759,11 +763,13 @@ function renderOutfits(){
     info.innerHTML='<div class="r-name">'+item.label+'</div><div class="r-tag">'+item.tag+'</div>';
     var tick=document.createElement('div');tick.className='r-tick';tick.textContent='✓';
     card.appendChild(thumb);card.appendChild(info);card.appendChild(tick);
-    (function(it){card.addEventListener('click',function(){
+    (function(it,sl){card.addEventListener('click',function(){
       if(card.classList.contains('locked'))return;
-      state.outfit=(state.outfit===it.key)?null:it.key;
+      // Selecting a set clears individual top/bottom; selecting individual clears set
+      if(sl==='set'){state.set=(state.set===it.key)?null:it.key;state.top=null;state.bottom=null;}
+      else{state[sl]=(state[sl]===it.key)?null:it.key;state.set=null;}
       renderOutfits();updateLook();render();
-    });})(item);
+    });})(item,slot);
     outfitGrid.appendChild(card);
   });
 }
@@ -817,12 +823,21 @@ function renderMobileDrawer(cat){
   if(cat==='outfits'){
     var all=OUTFIT_CATS.sets.concat(OUTFIT_CATS.tops).concat(OUTFIT_CATS.bottoms).concat(OUTFIT_CATS.dresses);
     all.forEach(function(item){
-      var isLocked=item.key==='kente_set'?!(outfitImgs['kente_top']&&outfitImgs['kente_skirt']):(item.locked||(!outfitImgs[item.key]&&!bottomImgs[item.key]));
+      var isLocked=item.key==='kente_set'?!(outfitImgs['kente_top']&&outfitImgs['kente_skirt']):(item.locked||!outfitImgs[item.key]);
+      var sl=OUTFIT_CATS.sets.find(function(x){return x.key===item.key;})?'set':OUTFIT_CATS.bottoms.find(function(x){return x.key===item.key;})?'bottom':'top';
+      var isActive=state[sl]===item.key;
       var card=document.createElement('div');
-      card.className='h-card'+(isLocked?' locked':'')+(state.outfit===item.key?' on':'');
+      card.className='h-card'+(isLocked?' locked':'')+(isActive?' on':'');
       card.style.cssText='flex-shrink:0;min-width:60px;';
       card.innerHTML='<div class="h-circle">'+IC[item.icon]+'</div><div class="h-name">'+item.label+'</div>';
-      if(!isLocked){(function(k){card.addEventListener('click',function(){state.outfit=(state.outfit===k)?null:k;renderMobileDrawer(cat);updateLook();render();});})(item.key);}
+      if(!isLocked){(function(it){
+        var sl=OUTFIT_CATS.sets.find(function(x){return x.key===it.key;})?'set':OUTFIT_CATS.bottoms.find(function(x){return x.key===it.key;})?'bottom':'top';
+        card.addEventListener('click',function(){
+          if(sl==='set'){state.set=(state.set===it.key)?null:it.key;state.top=null;state.bottom=null;}
+          else{state[sl]=(state[sl]===it.key)?null:it.key;state.set=null;}
+          renderMobileDrawer(cat);updateLook();render();
+        });
+      })(item);}
       container.appendChild(card);
     });
   } else if(cat==='shoes'){
@@ -850,11 +865,12 @@ renderMobileDrawer('outfits');
 // ── LOOK UPDATE ──
 function updateLook(){
   var parts=[],subs=[];
-  if(state.outfit){
-    var all=OUTFIT_CATS.sets.concat(OUTFIT_CATS.tops).concat(OUTFIT_CATS.bottoms).concat(OUTFIT_CATS.dresses);
-    var found=all.find(function(i){return i.key===state.outfit;});
+  var all=OUTFIT_CATS.sets.concat(OUTFIT_CATS.tops).concat(OUTFIT_CATS.bottoms).concat(OUTFIT_CATS.dresses);
+  [state.set,state.top,state.bottom].forEach(function(key){
+    if(!key)return;
+    var found=all.find(function(i){return i.key===key;});
     if(found){parts.push(found.label);if(found.tag)subs.push(found.tag);}
-  }
+  });
   document.getElementById('look-name').innerHTML=parts.length?'<em>'+parts.join(' · ')+'</em>':'';
   document.getElementById('look-sub').textContent=subs.join(' · ');
 }
@@ -862,7 +878,7 @@ function updateLook(){
 // ── RESET ──
 function resetAll(){
   if(!confirm('Reset look?'))return;
-  state={accent:null,outfit:null,bottom:null,shoe:null};
+  state={accent:null,set:null,top:null,bottom:null,shoe:null};
   renderLeft('accents');renderOutfits();renderShoes();
   renderMobileDrawer(currentMobileCat);updateLook();render();
 }

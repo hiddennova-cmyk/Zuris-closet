@@ -580,21 +580,20 @@ function render(){
     else stripAndDraw(img,W,H);
   }
 
-  // Draw order: base -> bottom -> top -> accent -> shoe
+  // Draw order: base -> shoe -> bottom -> top -> accent
   if(baseImg)draw(baseImg,'base','base');
 
+  if(state.shoe&&shoeImgs[state.shoe])draw(shoeImgs[state.shoe],state.shoe,'shoe');
+
   if(state.set==='kente_set'){
-    // Full set: skirt first then top
     if(outfitImgs['kente_skirt'])draw(outfitImgs['kente_skirt'],'kente_skirt','outfit');
     if(outfitImgs['kente_top'])draw(outfitImgs['kente_top'],'kente_top','outfit');
   } else {
-    // Individual pieces
     if(state.bottom&&outfitImgs[state.bottom])draw(outfitImgs[state.bottom],state.bottom,'outfit');
     if(state.top&&outfitImgs[state.top])draw(outfitImgs[state.top],state.top,'outfit');
   }
 
   if(state.accent&&accentImgs[state.accent])draw(accentImgs[state.accent],state.accent,'accent');
-  if(state.shoe&&shoeImgs[state.shoe])draw(shoeImgs[state.shoe],state.shoe,'shoe');
 }
 
 // ── LOAD BASE ──
